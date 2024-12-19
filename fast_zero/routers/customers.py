@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
 from fast_zero.models.model import User
-from fast_zero.schemas.schemaCustomers import CustomerCreate
-from fast_zero.schemas.schemaMessage import Message
+from fast_zero.schemas.schema_customers import CustomerCreate
+from fast_zero.schemas.schema_message import Message
 
 router = APIRouter(
     prefix='/customers',

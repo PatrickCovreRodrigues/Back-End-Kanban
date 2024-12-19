@@ -10,7 +10,7 @@ from fast_zero.models.database import get_session
 # from fast_zero.models.model import Activity, User
 from fast_zero.models.model import Activity, Project
 from fast_zero.schemas.schema_activity import ActivityCreate, ActivityRead
-from fast_zero.schemas.schemaMessage import Message
+from fast_zero.schemas.schema_message import Message
 
 router = APIRouter(
     prefix='/activitys',

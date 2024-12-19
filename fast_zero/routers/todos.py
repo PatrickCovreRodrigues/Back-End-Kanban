@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
 from fast_zero.models.model import Activity, Todo, TodoState
-from fast_zero.schemas.schemaTodo import TodoCreate, TodoList, TodoSchema
+from fast_zero.schemas.schema_todo import TodoCreate, TodoList, TodoSchema
 from fast_zero.utils.validUtils import is_valid_state_transition
 
 router = APIRouter(prefix='/todos', tags=['todos'])
