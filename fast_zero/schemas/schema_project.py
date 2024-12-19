@@ -1,17 +1,18 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
 
 
 class ProjectCreate(BaseModel):
     id: int
     name: str
     description_project: str
-    created_at: datetime
     customer_id: int
-    
+
     class Config:
         orm_mode = True
 
 
 class ProjectRead(BaseModel):
     project: list[ProjectCreate]
+    created_at: datetime
