@@ -11,5 +11,11 @@ class ActivityCreate(BaseModel):
 
 
 class ActivityRead(BaseModel):
-    activity: list[ActivityCreate]
+    id: int
+    name: str
+    description_activity: str
+    project_id: int
     created_at: datetime
+
+    class Config:
+        orm_mode = True

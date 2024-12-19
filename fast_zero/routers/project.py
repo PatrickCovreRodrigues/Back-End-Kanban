@@ -48,7 +48,7 @@ def project_created(project: ProjectCreate, session: Session = Depends(get_sessi
 
 @router.get('/', response_model=List[ProjectRead])
 def read_all_project(session: Session = Depends(get_session)):
-    project_db = session.execute(select(Project)).scalars().all()
+    project_db = session.scalars(select(Project)).all()
     if not project_db:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,

@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
 from fast_zero.models.model import User
-from fast_zero.schemas.schema_customers import CustomerCreate
+from fast_zero.schemas.schema_customers import CustomerCreate, CustomerRead
 from fast_zero.schemas.schema_message import Message
 
 router = APIRouter(
@@ -40,6 +41,18 @@ def customer_registration(customer: CustomerCreate, session: Session = Depends(g
     session.refresh(new_customer)
 
     return new_customer
+
+
+@router.get('/', response_model=List[CustomerRead])
+def read_all_customers(session: Session = Depends(get_session)):
+    db_user = session.execute(select(User)).scalars().all()
+    if not db_user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Não existe clientes!'
+        )
+
+    return db_user
 
 
 @router.get('/{customer_id}', response_model=CustomerCreate)
