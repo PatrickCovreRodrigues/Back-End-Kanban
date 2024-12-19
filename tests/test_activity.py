@@ -17,6 +17,12 @@ def test_project_not_found(client, create_project):
     assert response.json() == {'detail': 'Projeto não existe!'}
 
 
+def test_activity_read_all_not_found(client):
+    response = client.get('/activitys')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Não existe atividades!'}
+
+
 def test_put_activity_not_found(client):
     activity_data = {
         'id': 1,

@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -8,7 +9,7 @@ from fast_zero.models.database import get_session
 
 # from fast_zero.models.model import Activity, User
 from fast_zero.models.model import Activity, Project
-from fast_zero.schemas.schema_activity import ActivityCreate
+from fast_zero.schemas.schema_activity import ActivityCreate, ActivityRead
 from fast_zero.schemas.schemaMessage import Message
 
 router = APIRouter(
@@ -45,6 +46,17 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     session.refresh(new_activity)
 
     return new_activity
+
+
+@router.get('/', response_model=List[ActivityRead])
+def read_all_activity(session: Session = Depends(get_session)):
+    activitys = session.execute(select(Activity)).scalars().all()
+    if not activitys:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Não existe atividades!'
+        )
+    return activitys
 
 
 @router.get('/{activity_id}', response_model=ActivityCreate)

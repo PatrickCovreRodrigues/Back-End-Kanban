@@ -9,9 +9,6 @@ class ProjectCreate(BaseModel):
     description_project: str
     customer_id: int
 
-    class Config:
-        orm_mode = True
-
 
 class ProjectRead(BaseModel):
     project: list[ProjectCreate]

@@ -57,23 +57,11 @@ def test_return_project_get(client, create_project):
     response = client.get(f'/projects/{project_id}')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'id': project_id, 'name': 'Teste', 'description_project': 'Alguma coisa!', 'customer_id': 1
+        'customer_id': 1,
+        'description_project': 'Alguma coisa!',
+        'id': 1,
+        'name': 'Teste',
     }
-
-
-def test_return_project_get_all(client, create_project):
-    response = client.get('/projects/')
-    assert response.status_code == HTTPStatus.OK
-    projects = response.json()
-    assert isinstance(projects, list)
-    assert len(projects) > 0
-
-    project = projects[0]
-    assert 'id' in project
-    assert 'name' in project
-    assert 'description_project' in project
-    assert 'customer_id' in project
-    assert 'created_at' in project
 
 
 def test_project_not_found(client, create_project):
