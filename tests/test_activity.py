@@ -1,172 +1,73 @@
-# from http import HTTPStatus
+from http import HTTPStatus
 
 
-# def test_create_activity(client):
-#     client.post(
-#         '/customers',
-#         json={
-#             'id': 1,
-#             'name': 'Cliente Teste',
-#             'email': 'cliente@teste.com',
-#             'description': 'Cliente para teste',
-#         }
-#     )
-
-#     response = client.post(
-#         '/activity/',
-#         json={
-#             'id': 1,
-#             'name': 'Atividade Teste',
-#             'description_activity': 'Descrição da atividade de teste',
-#             'customer_id': 1,
-#         }
-#     )
-
-#     assert response.status_code == HTTPStatus.CREATED
-#     assert response.json() == {
-#         'id': 1,
-#         'name': 'Atividade Teste',
-#         'description_activity': 'Descrição da atividade de teste',
-#         'customer_id': 1,
-#     }
+def test_create_activity(create_activity):
+    assert create_activity.status_code == HTTPStatus.CREATED
 
 
-# def test_not_customer_activity(client):
-#     client.post(
-#         '/customers',
-#         json={
-#             'id': 1,
-#             'name': 'Cliente Teste',
-#             'email': 'cliente@teste.com',
-#             'description': 'Cliente para teste',
-#         }
-#     )
-
-#     response = client.post(
-#         '/activity/',
-#         json={
-#             'id': 1,
-#             'name': 'Atividade Teste',
-#             'description_activity': 'Descrição da atividade de teste',
-#             'customer_id': 2,
-#         }
-#     )
-
-#     assert response.status_code == HTTPStatus.CREATED
-#     assert response.json() == {
-#         'id': 1,
-#         'name': 'Atividade Teste',
-#         'description_activity': 'Descrição da atividade de teste',
-#         'customer_id': 1,
-#     }
+def test_project_not_found(client, create_project):
+    activity_creat = {
+        'id': 1,
+        'name': 'Teste',
+        'description_activity': 'Alguma coisa!',
+        'project_id': 3
+    }
+    response = client.post('/activitys', json=activity_creat)
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Projeto não existe!'}
 
 
-# def test_read_activity(client):
-#     client.post(
-#         '/customers',
-#         json={
-#             'id': 1,
-#             'name': 'Cliente Teste',
-#             'email': 'cliente@teste.com',
-#             'description': 'Cliente para teste',
-#         }
-#     )
-#     client.post(
-#         '/activity/',
-#         json={
-#             'id': 1,
-#             'name': 'Atividade Teste',
-#             'description_activity': 'Descrição da atividade de teste',
-#             'customer_id': 1,
-#         }
-#     )
-
-#     response = client.get('/activity/1')
-#     assert response.status_code == HTTPStatus.OK
-#     assert response.json() == {
-#         'id': 1,
-#         'name': 'Atividade Teste',
-#         'description_activity': 'Descrição da atividade de teste',
-#         'customer_id': 1,
-#     }
+def test_put_activity_not_found(client):
+    activity_data = {
+        'id': 1,
+        'name': 'Teste',
+        'description_activity': 'Alguma coisa!',
+        'project_id': 1
+    }
+    response = client.put('/activitys/2', json=activity_data)
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Atividade não encontrada!'}
 
 
-# def test_update_activity(client):
-#     client.post(
-#         '/customers',
-#         json={
-#             'id': 1,
-#             'name': 'Cliente Teste',
-#             'email': 'cliente@teste.com',
-#             'description': 'Cliente para teste',
-#         }
-#     )
+def test_put_project_not_found(client, create_activity):
+    second_activity_data = {
+        'id': 1,
+        'name': 'Teste',
+        'description_activity': 'Alguma coisa!',
+        'project_id': 1
+    }
+    response = client.post('/activitys', json=second_activity_data)
 
-#     response = client.post(
-#         '/activity/',
-#         json={
-#             'id': 1,
-#             'name': 'Atividade Teste',
-#             'description_activity': 'Descrição da atividade de teste',
-#             'customer_id': 1,
-#         }
-#     )
-
-#     assert response.status_code == HTTPStatus.CREATED
-#     assert response.json() == {
-#         'id': 1,
-#         'name': 'Atividade Teste',
-#         'description_activity': 'Descrição da atividade de teste',
-#         'customer_id': 1,
-#     }
-
-#     response = client.put(
-#         '/activity/1',
-#         json={
-#             'id': 1,
-#             'name': 'Te',
-#             'description_activity': 'Testado!',
-#             'customer_id': 1
-#         }
-#     )
-#     assert response.status_code == HTTPStatus.OK
-#     assert response.json() == {
-#         'id': 1,
-#         'name': 'Te',
-#         'description_activity': 'Testado!',
-#         'customer_id': 1
-#     }
+    activity_data = {
+        'id': 1,
+        'name': 'Teste Atualizado',
+        'description_activity': 'Alguma coisa atualizada!',
+        'project_id': 4
+    }
+    response = client.put('/activitys/1', json=activity_data)
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Projeto não encontrado!'}
 
 
-# def test_delete_activity(client):
-#     client.post(
-#         '/customers',
-#         json={
-#             'id': 1,
-#             'name': 'Cliente Teste',
-#             'email': 'cliente@teste.com',
-#             'description': 'Cliente para teste',
-#         }
-#     )
+def test_activity_equals_conflict(client, create_activity):
+    activity_creat = {
+        'id': 1,
+        'name': 'Teste',
+        'description_activity': 'Alguma coisa!',
+        'project_id': 1
+    }
+    response = client.post('/activitys', json=activity_creat)
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {'detail': 'Atividade já existe!'}
 
-#     response = client.post(
-#         '/activity/',
-#         json={
-#             'id': 1,
-#             'name': 'Atividade Teste',
-#             'description_activity': 'Descrição da atividade de teste',
-#             'customer_id': 1,
-#         }
-#     )
 
-#     assert response.status_code == HTTPStatus.CREATED
-#     assert response.json() == {
-#         'id': 1,
-#         'name': 'Atividade Teste',
-#         'description_activity': 'Descrição da atividade de teste',
-#         'customer_id': 1,
-#     }
+def test_delete_activity_not_found(client, create_activity):
+    response = client.delete('/activitys/2')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Atividade não encontrada!'}
 
-#     response = client.delete('/activity/1')
 
-#     assert response.status_code == HTTPStatus.OK
+def test_delete_activity_ok(client, create_activity):
+    response = client.delete('/activitys/1')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'message': 'Atividade deletada!'}

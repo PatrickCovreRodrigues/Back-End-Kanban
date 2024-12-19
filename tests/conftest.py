@@ -59,3 +59,16 @@ def create_project(client, create_customer):
     response = client.post('/projects', json=project_data)
     assert response.status_code == HTTPStatus.CREATED
     return response
+
+
+@pytest.fixture
+def create_activity(client, create_project):
+    activity_data = {
+        'id': 1,
+        'name': 'Teste',
+        'description_activity': 'Alguma coisa!',
+        'project_id': 1
+    }
+    response = client.post('/activitys', json=activity_data)
+    assert response.status_code == HTTPStatus.CREATED
+    return response

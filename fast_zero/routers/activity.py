@@ -12,8 +12,8 @@ from fast_zero.schemas.schema_activity import ActivityCreate
 from fast_zero.schemas.schemaMessage import Message
 
 router = APIRouter(
-    prefix='/activity',
-    tags=['activity'],
+    prefix='/activitys',
+    tags=['activitys'],
 )
 
 
@@ -24,21 +24,21 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     )
     if not project:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail='Projeto não existe'
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Projeto não existe!'
         )
     activity_creat = session.scalar(
         select(Activity).where(Activity.id == activity.id)
     )
     if activity_creat:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail='Atividade já existe'
+            status_code=HTTPStatus.CONFLICT,
+            detail='Atividade já existe!'
         )
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
-        customer_id=activity.project_id
+        project_id=activity.project_id
     )
     session.add(new_activity)
     session.commit()
@@ -71,12 +71,13 @@ def update_activity(
     if not db_activity:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Atividade não encontrada'
+            detail='Atividade não encontrada!'
         )
-    if not activity.project_id:
+    db_project = session.scalar(select(Project).where(Project.id == activity.project_id))
+    if not db_project:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Projeto não encontrado'
+            detail='Projeto não encontrado!'
         )
     db_activity.name = activity.name
     db_activity.description_activity = activity.description_activity
@@ -96,7 +97,7 @@ def delete_activity(
     if not db_activity:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Atividade não encontrada'
+            detail='Atividade não encontrada!'
         )
     session.delete(db_activity)
     session.commit()
