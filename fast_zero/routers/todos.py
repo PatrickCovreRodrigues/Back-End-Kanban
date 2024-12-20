@@ -1,112 +1,74 @@
-from http import HTTPStatus
-from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
+from http import HTTPStatus
 
-from fast_zero.models.database import get_session
-from fast_zero.models.model import Activity, Todo, TodoState
-from fast_zero.schemas.schema_todo import TodoCreate, TodoList, TodoSchema
-from fast_zero.utils.validUtils import is_valid_state_transition
+from fast_zero.models.model import Todo, Activity
+from fast_zero.schemas import TodoCreate, TodoRead 
+from fast_zero.database import get_session
 
-router = APIRouter(prefix='/todos', tags=['todos'])
-
-
-@router.get('/', response_model=TodoList)
-def list_todos(
-    session: Session = Depends(get_session),
-    states: List[TodoState] | None = Query(None),
-    exclude_trash: bool = True,
-    title: str | None = None,
-    description: str | None = None,
-    offset: int = 0,
-    limit: int = 10,
-):
-    query = select(Todo)
-
-    if states:
-        query = query.where(Todo.state.in_(states))
-
-    if exclude_trash:
-        query = query.where(Todo.state != TodoState.trash)
-
-    if title:
-        query = query.where(Todo.title.contains(title))
-
-    if description:
-        query = query.where(Todo.description_activity.contains(description))
-
-    todos = session.scalars(query.offset(offset).limit(limit)).all()
-
-    return {'todos': todos}
+router = APIRouter()
 
 
-@router.post('/', response_model=dict)
-def create_todo(
-    todo: TodoCreate,
-    session: Session = Depends(get_session),
-):
-    activity = session.query(Activity).where(Activity.id == todo.activity_id).first()
-
+@router.post('/', response_model=TodoRead, status_code=HTTPStatus.CREATED)
+def create_todo(todo: TodoCreate, session: Session = Depends(get_session)):
+    activity = session.query(Activity).filter(Activity.id == todo.activity_id).first()
     if not activity:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Não existe essa atividade')
-
-    new_todo = Todo(
-        title=todo.title,
-        description_activity=todo.description_activity,
-        state=todo.state,
-        activity_id=activity.id,
-    )
-
+            detail='Atividade não encontrada.'
+        )
+    new_todo = Todo(**todo.dict())
     session.add(new_todo)
     session.commit()
     session.refresh(new_todo)
 
-    return {"message": "Atualização da atividade feita!", "id": new_todo.id}
+    return new_todo
 
 
-@router.patch('/{todo_id}/state', response_model=TodoSchema)
-def update_todo_state(
-    todo_id: int,
-    new_state: TodoState,
-    session: Session = Depends(get_session),
-):
-    db_todo = session.scalar(select(Todo).where(Todo.id == todo_id))
-    if not db_todo:
+@router.get('/', response_model=List[TodoRead])
+def read_tasks(session: Session = Depends(get_session)):
+    todos = session.query(Todo).all()
+    return todos
+
+
+@router.get('/{todo_id}', response_model=TodoRead)
+def read_todo(todo_id: int, session: Session = Depends(get_session)):
+    todo = session.query(Todo).filter(Todo.id == todo_id).first()
+    if not todo:
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail='Tarefa não encontrada.'
         )
 
-    if not is_valid_state_transition(db_todo.state, new_state):
-        raise HTTPException(
-            status_code=400,
-            detail=f'Transição de estado de {db_todo.state} para {new_state} não é permitida.'
-        )
+    return todo
 
-    db_todo.state = new_state
+
+@router.put('/{todo_id}', response_model=TodoRead)
+def update_todo(todo_id: int, todo: TodoCreate, session: Session = Depends(get_session)):
+    db_todo = session.query(Todo).filter(Todo.id == todo_id).first()
+    if not db_todo:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Tarefa não encontrada.'
+        )
+    for key, value in todo.dict().items():
+        setattr(db_todo, key, value)
+    
+
     session.commit()
     session.refresh(db_todo)
-
     return db_todo
 
 
 @router.delete('/{todo_id}', response_model=dict)
-def delete_todo(
-    todo_id: int,
-    session: Session = Depends(get_session),
-):
-    db_todo = session.scalar(select(Todo).where(Todo.id == todo_id))
-    if not db_todo:
+def delete_todo(todo_id: int, session: Session = Depends(get_session)):
+    todo = session.query(Todo).filter(Todo.id == todo_id).first()
+    if not todo:
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail='Tarefa não encontrada.'
         )
-
-    session.delete(db_todo)
+    session.delete(todo)
     session.commit()
-
-    return {'message': 'Success'}
+    return {'detail': 'Tarefa deletada com sucesso!'}

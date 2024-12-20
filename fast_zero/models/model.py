@@ -1,27 +1,18 @@
 from datetime import datetime
-from enum import Enum
+from enum import Enum as PyEnum
 
-from sqlalchemy import ForeignKey, func
-from sqlalchemy.orm import Mapped, mapped_column, registry
+from sqlalchemy import Enum, ForeignKey, func
+from sqlalchemy.orm import Mapped, relationship, mapped_column, registry
 
 table_registry = registry()
 
 
-class TodoState(str, Enum):
-    draft = 'draft'
-    todo = 'todo'
-    doing = 'doing'
-    done = 'done'
-    trash = 'trash'
-
-
-VALID_STATE_TRANSITIONS = {
-    TodoState.draft: [TodoState.todo],
-    TodoState.todo: [TodoState.doing, TodoState.trash],
-    TodoState.doing: [TodoState.done, TodoState.todo],
-    TodoState.done: [TodoState.trash],
-    TodoState.trash: [],
-}
+class TodoState(str, PyEnum):
+    PENDING = 'Pendente'
+    TODO = 'A fazer'
+    IN_PROGRESS = 'Em progresso'
+    STAND_BY = 'Em espera'
+    DONE = 'Feito'
 
 
 @table_registry.mapped_as_dataclass
@@ -31,9 +22,10 @@ class Todo:
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     title: Mapped[str]
     description_activity: Mapped[str]
-    state: Mapped[TodoState]
-
     activity_id: Mapped[int] = mapped_column(ForeignKey('activitys.id'))
+    state: Mapped[TodoState] = mapped_column(Enum(TodoState), default=TodoState.PENDING)
+
+    activity = relationship('Activity', back_populates='todos')
 
 
 @table_registry.mapped_as_dataclass
@@ -78,3 +70,5 @@ class Activity:
     )
 
     project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'))
+    todos = relationship('Todo', back_populates='activity')
+

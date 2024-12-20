@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
 from fast_zero.models.model import Project, User
-from fast_zero.schemas.schema_project import ProjectCreate, ProjectRead
 from fast_zero.schemas.schema_message import Message
+from fast_zero.schemas.schema_project import ProjectCreate, ProjectRead
 
 router = APIRouter(
     prefix='/projects',

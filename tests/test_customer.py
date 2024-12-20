@@ -23,6 +23,26 @@ def test_return_customer(client, create_customer):
     }
 
 
+def test_get_all(client, create_customer):
+    response = client.get('/customers')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == [
+        {
+            'created_at': '2024-12-19T17:34:12',
+            'description': 'Alguma coisa!',
+            'email': 'Teste@gmail.com',
+            'id': 1,
+            'name': 'Teste',
+        },
+    ]
+
+
+def test_customer_all_not_found(client):
+    response = client.get('/customers/')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Não existe clientes!'}
+
+
 def test_update_customers(client, create_customer):
     update_data = {
         'id': 1,
