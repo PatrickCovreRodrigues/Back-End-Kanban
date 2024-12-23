@@ -55,6 +55,8 @@ class Project:
     )
 
     customer_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    activities = relationship("Activity", back_populates="project", cascade="all, delete")
+
 
 
 @table_registry.mapped_as_dataclass
@@ -70,5 +72,6 @@ class Activity:
     )
 
     project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'))
+    project = relationship("Project", back_populates="activities")
     todos = relationship('Todo', back_populates='activity')
 
