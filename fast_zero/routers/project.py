@@ -16,24 +16,17 @@ router = APIRouter(
 )
 
 
-@router.post('/', status_code=HTTPStatus.CREATED, response_model=ProjectCreate)
+@router.post('/', status_code=HTTPStatus.CREATED, response_model=ProjectRead)
 def project_created(project: ProjectCreate, session: Session = Depends(get_session)):
-    user_id = session.scalar(
+    customer_exists = session.scalar(
         select(User).where(User.id == project.customer_id)
     )
-    if not user_id:
+    if not customer_exists:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Cliente não existe!'
         )
-    project_creat = session.scalar(
-        select(Project).where(Project.id == project.id)
-    )
-    if project_creat:
-        raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail='Projeto já existe!'
-        )
+
     new_project = Project(
         name=project.name,
         description_project=project.description_project,
@@ -44,6 +37,7 @@ def project_created(project: ProjectCreate, session: Session = Depends(get_sessi
     session.refresh(new_project)
 
     return new_project
+
 
 
 @router.get('/', response_model=List[ProjectRead])
