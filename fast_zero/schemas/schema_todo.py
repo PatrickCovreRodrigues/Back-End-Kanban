@@ -1,52 +1,51 @@
-from typing import List, Optional
+# from typing import List, Optional
 
-from pydantic import BaseModel
+# from pydantic import BaseModel
 
-import enum
+# import enum
 
-class TodoState(str, enum.Enum):
-    PENDING = "Pendente"
-    TODO = "A Fazer"
-    IN_PROGRESS = "Fazendo"
-    ON_HOLD = "Parado"
-    DONE = "Concluído"
-
-
-class TodoSchema(BaseModel):
-    title: str
-    description: str
-    state: TodoState
+# class TodoState(str, enum.Enum):
+#     PENDING = 'Pendente'
+#     TODO = 'A fazer'
+#     IN_PROGRESS = 'Em progresso'
+#     STAND_BY = 'Em espera'
+#     DONE = 'Feito'
 
 
-class TodoList(BaseModel):
-    todos: list[TodoSchema]
+# class TodoSchema(BaseModel):
+#     title: str
+#     state: TodoState
 
 
-class TodoCreate(TodoSchema):
-    pass
+# class TodoList(BaseModel):
+#     todos: list[TodoSchema]
 
 
-class TodoRead(TodoSchema):
-    id: int
-    activity_id: int
-
-    class Config:
-        orm_mode = True
+# class TodoCreate(TodoSchema):
+#     activity_id: int
 
 
-class ActivityBase(BaseModel):
-    name: str
-    description_activity: str
-    project_id: int
+# class TodoRead(TodoSchema):
+#     id: int
+#     activity_id: int
+
+#     class Config:
+#         orm_mode = True
 
 
-class ActivityCreate(ActivityBase):
-    pass
+# class ActivityBase(BaseModel):
+#     name: str
+#     description_activity: str
+#     project_id: int
 
 
-class ActivityRead(ActivityBase):
-    id: int
-    todos: list[TodoRead] = []
+# class ActivityCreate(ActivityBase):
+#     pass
 
-    class Config:
-        orm_mode = True
+
+# class ActivityRead(ActivityBase):
+#     id: int
+#     todos: list[TodoRead] = []
+
+#     class Config:
+#         orm_mode = True

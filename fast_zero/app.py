@@ -5,7 +5,7 @@ from fastapi import FastAPI
 print(sys.path)
 
 from fastapi.middleware.cors import CORSMiddleware
-from fast_zero.routers import activity, customers, project, todos
+from fast_zero.routers import activity, customers, project
 
 app = FastAPI()
 
@@ -22,7 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(todos.router, tags=["todos"])
 app.include_router(customers.router, tags=["customers"])
 app.include_router(activity.router, tags=["activitys"])
 app.include_router(project.router, tags=["projects"])

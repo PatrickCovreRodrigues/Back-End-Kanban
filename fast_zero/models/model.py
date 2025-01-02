@@ -16,19 +16,6 @@ class TodoState(str, PyEnum):
 
 
 @table_registry.mapped_as_dataclass
-class Todo:
-    __tablename__ = 'todos'
-
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    title: Mapped[str]
-    description_activity: Mapped[str]
-    activity_id: Mapped[int] = mapped_column(ForeignKey('activitys.id'))
-    state: Mapped[TodoState] = mapped_column(Enum(TodoState), default=TodoState.PENDING)
-
-    activity = relationship('Activity', back_populates='todos')
-
-
-@table_registry.mapped_as_dataclass
 class User:
     __tablename__ = 'users'
 
@@ -58,7 +45,6 @@ class Project:
     activities = relationship("Activity", back_populates="project", cascade="all, delete")
 
 
-
 @table_registry.mapped_as_dataclass
 class Activity:
     __tablename__ = 'activitys'
@@ -66,12 +52,11 @@ class Activity:
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str]
     description_activity: Mapped[str]
+    project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'))
+    status: Mapped[str] = mapped_column(Enum(TodoState), default=TodoState.PENDING)
     created_at: Mapped[datetime] = mapped_column(
          # pylint: disable=not-callable
         init=False, server_default=func.now()
     )
 
-    project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'))
     project = relationship("Project", back_populates="activities")
-    todos = relationship('Todo', back_populates='activity')
-
