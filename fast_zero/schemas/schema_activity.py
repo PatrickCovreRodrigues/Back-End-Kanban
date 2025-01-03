@@ -17,6 +17,7 @@ class ActivityRead(BaseModel):
     name: str
     description_activity: str
     project_id: int
+    status: TodoState
     created_at: datetime
 
     class Config:

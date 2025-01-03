@@ -17,6 +17,7 @@ router = APIRouter(
     tags=['activitys'],
 )
 
+
 @router.post('/', response_model=ActivityCreate)
 def activity_created(activity: ActivityCreate, session: Session = Depends(get_session)):
     project = session.scalar(
@@ -27,16 +28,7 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
             status_code=HTTPStatus.NOT_FOUND,
             detail="Projeto não existe!"
         )
-    
-    activity_exists = session.scalar(
-        select(Activity).where(Activity.name == activity.name, Activity.project_id == activity.project_id)
-    )
-    if activity_exists:
-        raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail="Atividade já existe para este projeto!"
-        )
-    
+        
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
@@ -49,7 +41,6 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     session.refresh(new_activity)
 
     return new_activity
-
 
 
 @router.get('/', response_model=List[ActivityRead])
