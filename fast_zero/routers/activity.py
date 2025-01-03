@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from fast_zero.models.database import get_session
 
 # from fast_zero.models.model import Activity, User
-from fast_zero.models.model import Activity, Project
+from fast_zero.models.model import Activity, Project, TodoState
 from fast_zero.schemas.schema_activity import ActivityCreate, ActivityRead
 from fast_zero.schemas.schema_message import Message
 
@@ -17,8 +17,7 @@ router = APIRouter(
     tags=['activitys'],
 )
 
-
-@router.post('/', status_code=HTTPStatus.CREATED, response_model=ActivityCreate)
+@router.post('/', response_model=ActivityCreate)
 def activity_created(activity: ActivityCreate, session: Session = Depends(get_session)):
     project = session.scalar(
         select(Project).where(Project.id == activity.project_id)
@@ -26,26 +25,31 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     if not project:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Projeto não existe!'
+            detail="Projeto não existe!"
         )
-    activity_creat = session.scalar(
-        select(Activity).where(Activity.id == activity.id)
+    
+    activity_exists = session.scalar(
+        select(Activity).where(Activity.name == activity.name, Activity.project_id == activity.project_id)
     )
-    if activity_creat:
+    if activity_exists:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='Atividade já existe!'
+            detail="Atividade já existe para este projeto!"
         )
+    
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
-        project_id=activity.project_id
+        project_id=activity.project_id,
+        status="PENDING"
     )
+    
     session.add(new_activity)
     session.commit()
     session.refresh(new_activity)
 
     return new_activity
+
 
 
 @router.get('/', response_model=List[ActivityRead])
@@ -93,11 +97,24 @@ def update_activity(
         )
     db_activity.name = activity.name
     db_activity.description_activity = activity.description_activity
+    db_activity.status = activity.status
     db_activity.project_id = activity.project_id
     session.commit()
     session.refresh(db_activity)
 
     return db_activity
+
+
+@router.patch("/{activity_id}/status/")
+def update_activity_status(activity_id: int, status: TodoState, session: Session = Depends(get_session)):
+    activity = session.query(Activity).filter(Activity.id == activity_id).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    
+    activity.status = status
+    session.commit()
+    session.refresh(activity)
+    return {"message": "Status updated", "activity": activity}
 
 
 @router.delete('/{activity_id}', response_model=Message)
