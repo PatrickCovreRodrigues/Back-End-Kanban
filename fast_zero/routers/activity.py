@@ -1,9 +1,8 @@
 from http import HTTPStatus
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-
-
-from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -30,14 +29,12 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
             status_code=HTTPStatus.NOT_FOUND,
             detail="Projeto não existe!"
         )
-        
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
         project_id=activity.project_id,
         status="PENDING"
     )
-    
     session.add(new_activity)
     session.commit()
     session.refresh(new_activity)
@@ -101,6 +98,7 @@ def update_activity(
 class StatusUpdate(BaseModel):
     status: TodoState
 
+
 @router.patch("/{activity_id}/status/")
 def update_activity_status(
     activity_id: int,
@@ -111,7 +109,6 @@ def update_activity_status(
     activity = session.query(Activity).filter(Activity.id == activity_id).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
-    
     activity.status = status_update.status
     session.commit()
     session.refresh(activity)

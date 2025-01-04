@@ -39,7 +39,6 @@ def project_created(project: ProjectCreate, session: Session = Depends(get_sessi
     return new_project
 
 
-
 @router.get('/', response_model=List[ProjectRead])
 def read_all_project(session: Session = Depends(get_session)):
     project_db = session.scalars(select(Project)).all()

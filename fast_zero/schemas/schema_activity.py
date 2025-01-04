@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from fast_zero.models.model import TodoState
 from pydantic import BaseModel
+
+from fast_zero.models.model import TodoState
 
 
 class ActivityCreate(BaseModel):

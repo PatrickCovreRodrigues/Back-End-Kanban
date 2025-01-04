@@ -5,6 +5,7 @@ from fastapi import FastAPI
 print(sys.path)
 
 from fastapi.middleware.cors import CORSMiddleware
+
 from fast_zero.routers import activity, customers, project
 
 app = FastAPI()

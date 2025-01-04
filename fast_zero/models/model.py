@@ -1,10 +1,11 @@
-from datetime import datetime
 import enum
+from datetime import datetime
 
 from sqlalchemy import Enum, ForeignKey, func
-from sqlalchemy.orm import Mapped, relationship, mapped_column, registry
+from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 table_registry = registry()
+
 
 class TodoState(str, enum.Enum):
     PENDING = 'PENDING'
@@ -12,6 +13,7 @@ class TodoState(str, enum.Enum):
     INPROGRESS = 'INPROGRESS'
     WAITING = 'WAITING'
     DONE = 'DONE'
+
 
 @table_registry.mapped_as_dataclass
 class User:
@@ -24,6 +26,7 @@ class User:
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
+
 
 @table_registry.mapped_as_dataclass
 class Project:
@@ -39,6 +42,7 @@ class Project:
 
     customer_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     activities = relationship("Activity", back_populates="project", cascade="all, delete")
+
 
 @table_registry.mapped_as_dataclass
 class Activity:
