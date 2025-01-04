@@ -1,7 +1,9 @@
 from http import HTTPStatus
 from typing import List
+from pydantic import BaseModel
 
-from fastapi import APIRouter, Depends, HTTPException
+
+from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -96,13 +98,21 @@ def update_activity(
     return db_activity
 
 
+class StatusUpdate(BaseModel):
+    status: TodoState
+
 @router.patch("/{activity_id}/status/")
-def update_activity_status(activity_id: int, status: TodoState, session: Session = Depends(get_session)):
+def update_activity_status(
+    activity_id: int,
+    status_update: StatusUpdate,  # Define o status como um corpo de requisição
+    session: Session = Depends(get_session),
+):
+    print(f"Recebido: activity_id={activity_id}, status={status_update.status}")
     activity = session.query(Activity).filter(Activity.id == activity_id).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     
-    activity.status = status
+    activity.status = status_update.status
     session.commit()
     session.refresh(activity)
     return {"message": "Status updated", "activity": activity}
