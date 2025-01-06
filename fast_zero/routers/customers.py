@@ -55,7 +55,7 @@ def read_all_customers(session: Session = Depends(get_session)):
     return db_user
 
 
-@router.get('/{customer_id}', response_model=CustomerCreate)
+@router.get('/{customer_id}', response_model=CustomerRead)
 def read_customer(customer_id: int, session: Session = Depends(get_session)):
     db_user = session.scalar(select(User).where(User.id == customer_id))
     if not db_user:
@@ -67,7 +67,7 @@ def read_customer(customer_id: int, session: Session = Depends(get_session)):
     return db_user
 
 
-@router.put('/{customer_id}', response_model=CustomerCreate)
+@router.put('/{customer_id}', response_model=CustomerRead)
 def update_customer(
     customer_id: int,
     customer: CustomerCreate,

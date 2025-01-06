@@ -67,8 +67,10 @@ def create_activity(client, create_project):
         'id': 1,
         'name': 'Teste',
         'description_activity': 'Alguma coisa!',
-        'project_id': 1
+        'project_id': 1,
+        'status': 'PENDING'
     }
     response = client.post('/activitys', json=activity_data)
+    print(response.json())
     assert response.status_code == HTTPStatus.CREATED
     return response

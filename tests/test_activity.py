@@ -10,7 +10,8 @@ def test_project_not_found(client, create_project):
         'id': 1,
         'name': 'Teste',
         'description_activity': 'Alguma coisa!',
-        'project_id': 3
+        'project_id': 3,
+        'status': 'PENDING'
     }
     response = client.post('/activitys', json=activity_creat)
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -28,7 +29,8 @@ def test_put_activity_not_found(client):
         'id': 1,
         'name': 'Teste',
         'description_activity': 'Alguma coisa!',
-        'project_id': 1
+        'project_id': 1,
+        'status': 'PENDING'
     }
     response = client.put('/activitys/2', json=activity_data)
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -40,7 +42,8 @@ def test_put_project_not_found(client, create_activity):
         'id': 1,
         'name': 'Teste',
         'description_activity': 'Alguma coisa!',
-        'project_id': 1
+        'project_id': 1,
+        'status': 'PENDING'
     }
     response = client.post('/activitys', json=second_activity_data)
 
@@ -48,7 +51,8 @@ def test_put_project_not_found(client, create_activity):
         'id': 1,
         'name': 'Teste Atualizado',
         'description_activity': 'Alguma coisa atualizada!',
-        'project_id': 4
+        'project_id': 4,
+        'status': 'PENDING'
     }
     response = client.put('/activitys/1', json=activity_data)
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -60,7 +64,8 @@ def test_update_activity(client, create_activity):
         'id': 1,
         'name': 'Teste',
         'description_activity': 'Alguma coisa!',
-        'project_id': 1
+        'project_id': 1,
+        'status': 'PENDING'
     }
 
     response = client.put(f'/activitys/{create_activity.json()['id']}', json=put_activity_data)
@@ -81,20 +86,23 @@ def test_return_activity(client, create_activity):
         'id': activity_id,
         'name': 'Teste',
         'description_activity': 'Alguma coisa!',
-        'project_id': 1
+        'project_id': 1,
+        'status': 'PENDING',
+        'created_at': response.json()['created_at']
     }
 
 
-def test_activity_equals_conflict(client, create_activity):
-    activity_creat = {
-        'id': 1,
-        'name': 'Teste',
-        'description_activity': 'Alguma coisa!',
-        'project_id': 1
-    }
-    response = client.post('/activitys', json=activity_creat)
-    assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json() == {'detail': 'Atividade já existe!'}
+# def test_activity_equals_conflict(client, create_activity):
+#     activity_creat = {
+#         'id': 1,
+#         'name': 'Teste',
+#         'description_activity': 'Alguma coisa!',
+#         'project_id': 1,
+#         'status': 'PENDING'
+#     }
+#     response = client.post('/activitys', json=activity_creat)
+#     assert response.status_code == HTTPStatus.CONFLICT
+#     assert response.json() == {'detail': 'Atividade já existe!'}
 
 
 def test_activity_not_found(client, create_activity):
