@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.post('/', status_code=HTTPStatus.CREATED, response_model=CustomerCreate)
+@router.post('/', status_code=HTTPStatus.CREATED, response_model=CustomerRead)
 def customer_registration(customer: CustomerCreate, session: Session = Depends(get_session)):
     db_user = session.scalar(
         select(User).where(
