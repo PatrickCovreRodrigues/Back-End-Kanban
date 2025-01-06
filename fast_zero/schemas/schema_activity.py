@@ -6,7 +6,6 @@ from fast_zero.models.model import TodoState
 
 
 class ActivityCreate(BaseModel):
-    id: int
     name: str
     description_activity: str
     status: TodoState

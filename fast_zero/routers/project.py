@@ -50,7 +50,7 @@ def read_all_project(session: Session = Depends(get_session)):
     return project_db
 
 
-@router.get('/{project_id}', response_model=ProjectCreate)
+@router.get('/{project_id}', response_model=ProjectRead)
 def read_id_project(project_id: int, session: Session = Depends(get_session)):
     project_db = session.scalar(select(Project).where(project_id == Project.id))
     if not project_db:

@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
 
-# from fast_zero.models.model import Activity, User
 from fast_zero.models.model import Activity, Project, TodoState
 from fast_zero.schemas.schema_activity import ActivityCreate, ActivityRead
 from fast_zero.schemas.schema_message import Message
@@ -19,8 +18,9 @@ router = APIRouter(
 )
 
 
-@router.post('/', response_model=ActivityCreate)
+@router.post('/', response_model=ActivityRead)
 def activity_created(activity: ActivityCreate, session: Session = Depends(get_session)):
+    print(activity.dict())
     project = session.scalar(
         select(Project).where(Project.id == activity.project_id)
     )
