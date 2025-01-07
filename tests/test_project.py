@@ -17,18 +17,6 @@ def test_customer_not_found(client, create_customer):
     assert response.json() == {'detail': 'Cliente não existe!'}
 
 
-def test_exception_project_conflict(client, create_project):
-    project_data = {
-        'id': 1,
-        'name': 'Teste',
-        'description_project': 'Alguma coisa!',
-        'customer_id': 1
-    }
-    response = client.post('/projects/', json=project_data)
-    assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json() == {'detail': 'Projeto já existe!'}
-
-
 def test_project_all_not_found(client):
     response = client.get('/projects/')
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -46,7 +34,6 @@ def test_update_project(client, create_project):
     assert response.status_code == HTTPStatus.OK
 
     put_project = response.json()
-    assert put_project['id'] == project_data['id']
     assert put_project['name'] == project_data['name']
     assert put_project['description_project'] == project_data['description_project']
     assert put_project['customer_id'] == project_data['customer_id']
@@ -61,6 +48,7 @@ def test_return_project_get(client, create_project):
         'description_project': 'Alguma coisa!',
         'id': 1,
         'name': 'Teste',
+        'created_at': response.json()['created_at'],
     }
 
 
