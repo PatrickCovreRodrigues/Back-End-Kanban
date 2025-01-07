@@ -101,13 +101,13 @@ class StatusUpdate(BaseModel):
 @router.patch("/{activity_id}/status/")
 def update_activity_status(
     activity_id: int,
-    status_update: StatusUpdate,  # Define o status como um corpo de requisição
+    status_update: StatusUpdate,
     session: Session = Depends(get_session),
 ):
     print(f"Recebido: activity_id={activity_id}, status={status_update.status}")
     activity = session.query(Activity).filter(Activity.id == activity_id).first()
     if not activity:
-        raise HTTPException(status_code=404, detail="Activity not found")
+        raise HTTPException(status_code=404, detail="Atividade não encontrada!")
     activity.status = status_update.status
     session.commit()
     session.refresh(activity)

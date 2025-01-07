@@ -101,7 +101,26 @@ def test_return_activity(client, create_activity):
     }
 
 
-def test_activity_not_found(client, create_activity):
+def test_update_activity_status(client, create_activity):
+    status_update = {
+        'status': 'DONE'
+    }
+    response = client.patch('/activitys/1/status/', json=status_update)
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()['message'] == 'Status updated'
+    assert response.json()['activity']['status'] == 'DONE'
+
+
+def test_update_activity_status_not_found(client):
+    status_update = {
+        'status': 'DONE'
+    }
+    response = client.patch('/activitys/2/status/', json=status_update)
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Atividade não encontrada!'}
+
+
+def test_activity_not_found(client):
     response = client.get('/activitys/2')
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'Atividade não encontrada!'}
