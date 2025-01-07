@@ -18,10 +18,19 @@ def test_project_not_found(client, create_project):
     assert response.json() == {'detail': 'Projeto não existe!'}
 
 
-def test_activity_read_all_not_found(client):
-    response = client.get('/activitys')
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'Não existe atividades!'}
+def test_read_all_activity(client, create_activity):
+    with client as c:
+        response = c.get('/activitys')
+        assert response.status_code == HTTPStatus.OK
+        assert isinstance(response.json(), list)
+        assert len(response.json()) > 0
+
+
+def test_read_all_activity_not_found(client):
+    with client as c:
+        response = c.get('/activitys')
+        assert response.status_code == HTTPStatus.NOT_FOUND
+        assert response.json() == {'detail': 'Não existe atividades!'}
 
 
 def test_put_activity_not_found(client):
@@ -90,19 +99,6 @@ def test_return_activity(client, create_activity):
         'status': 'PENDING',
         'created_at': response.json()['created_at']
     }
-
-
-# def test_activity_equals_conflict(client, create_activity):
-#     activity_creat = {
-#         'id': 1,
-#         'name': 'Teste',
-#         'description_activity': 'Alguma coisa!',
-#         'project_id': 1,
-#         'status': 'PENDING'
-#     }
-#     response = client.post('/activitys', json=activity_creat)
-#     assert response.status_code == HTTPStatus.CONFLICT
-#     assert response.json() == {'detail': 'Atividade já existe!'}
 
 
 def test_activity_not_found(client, create_activity):

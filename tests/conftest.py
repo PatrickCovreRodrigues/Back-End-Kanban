@@ -71,6 +71,6 @@ def create_activity(client, create_project):
         'status': 'PENDING'
     }
     response = client.post('/activitys', json=activity_data)
-    print(response.json())
+    # print(response.json())
     assert response.status_code == HTTPStatus.CREATED
     return response

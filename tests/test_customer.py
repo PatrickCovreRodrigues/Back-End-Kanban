@@ -19,7 +19,8 @@ def test_return_customer(client, create_customer):
         'id': customer_id,
         'name': 'Teste',
         'email': 'Teste@gmail.com',
-        'description': 'Alguma coisa!'
+        'description': 'Alguma coisa!',
+        'created_at': response.json()['created_at']
     }
 
 
@@ -28,11 +29,11 @@ def test_get_all(client, create_customer):
     assert response.status_code == HTTPStatus.OK
     assert response.json() == [
         {
-            'created_at': '2024-12-19T17:34:12',
-            'description': 'Alguma coisa!',
-            'email': 'Teste@gmail.com',
             'id': 1,
             'name': 'Teste',
+            'email': 'Teste@gmail.com',
+            'description': 'Alguma coisa!',
+            'created_at': response.json()[0]['created_at']
         },
     ]
 
@@ -44,11 +45,16 @@ def test_customer_all_not_found(client):
 
 
 def test_update_customers(client, create_customer):
+    response = client.get('/customers/1')
+    assert response.status_code == HTTPStatus.OK
+    created_at = response.json()['created_at']
+
     update_data = {
         'id': 1,
         'name': 't',
         'email': 't@gmail.com',
-        'description': 't coisa!'
+        'description': 't coisa!',
+        'created_at': created_at
     }
     response = client.put('/customers/1', json=update_data)
     assert response.status_code == HTTPStatus.OK
