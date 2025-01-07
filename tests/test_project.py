@@ -23,6 +23,20 @@ def test_project_all_not_found(client):
     assert response.json() == {'detail': 'Não existe projetos!'}
 
 
+def test_return_get_projects(client, create_project):
+    response = client.get('/projects/')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == [
+        {
+            'customer_id': 1,
+            'description_project': 'Alguma coisa!',
+            'id': 1,
+            'name': 'Teste',
+            'created_at': response.json()[0]['created_at'],
+        }
+    ]
+
+
 def test_update_project(client, create_project):
     project_data = {
         'id': 1,

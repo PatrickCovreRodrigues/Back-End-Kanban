@@ -61,17 +61,6 @@ def read_id_project(project_id: int, session: Session = Depends(get_session)):
     return project_db
 
 
-@router.get('/{project_id}/activities_with_tasks')
-async def get_activities_with_tasks(project_id: int, session: Session = Depends(get_session)):
-    project_db = session.scalar(select(Project).where(Project.id == project_id))
-    if not project_db:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='Projeto não encontrado!'
-        )
-    return project_db
-
-
 @router.put('/{project_id}', response_model=ProjectCreate)
 def update_project(
     project_id: int,
